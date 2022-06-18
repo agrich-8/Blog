@@ -1,0 +1,56 @@
+.navbar {
+    --bs-navbar-padding-x: 0;
+    --bs-navbar-padding-y: 0.5rem;
+    --bs-navbar-color: rgba(0, 0, 0, 0.55);
+    --bs-navbar-hover-color: rgba(0, 0, 0, 0.7);
+    --bs-navbar-disabled-color: rgba(0, 0, 0, 0.3);
+    --bs-navbar-active-color: rgba(0, 0, 0, 0.9);
+    --bs-navbar-brand-padding-y: 0.3125rem;
+    --bs-navbar-brand-margin-end: 1rem;
+    --bs-navbar-brand-font-size: 1.25rem;
+    --bs-navbar-brand-color: rgba(0, 0, 0, 0.9);
+    --bs-navbar-brand-hover-color: rgba(0, 0, 0, 0.9);
+    --bs-navbar-nav-link-padding-x: 0.5rem;
+    --bs-navbar-toggler-padding-y: 0.25rem;
+    --bs-navbar-toggler-padding-x: 0.75rem;
+    --bs-navbar-toggler-font-size: 1.25rem;
+    --bs-navbar-toggler-icon-bg: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e);
+    --bs-navbar-toggler-border-color: rgba(0, 0, 0, 0.1);
+    --bs-navbar-toggler-border-radius: 0.375rem;
+    --bs-navbar-toggler-focus-width: 0.25rem;
+    --bs-navbar-toggler-transition: box-shadow 0.15s ease-in-out;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bs-navbar-padding-y) var(--bs-navbar-padding-x);
+}
+.navbar-color{
+    --bs-navbar-color: rgb(0 119 197 / 61%);
+    --bs-navbar-hover-color: rgb(231 19 19 / 75%);
+    --bs-navbar-disabled-color: rgb(147 32 32 / 25%);
+    --bs-navbar-active-color: #001b8b;
+    --bs-navbar-brand-color: #175059;
+    --bs-navbar-brand-hover-color: #ce1010;
+    --bs-navbar-toggler-border-color: rgb(136 25 25 / 10%);
+}
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+user agent stylesheet
+header {
+    display: block;
+}
+body {
+    margin: 0;
+    font-family: var(--bs-body-font-family);
+    font-size: var(--bs-body-font-size);
+    font-weight: var(--bs-body-font-weight);
+    line-height: var(--bs-body-line-height);
+    color: var(--bs-body-color);
+    text-align: var(--bs-body-text-align);
+    background-color: var(--bs-body-bg);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
