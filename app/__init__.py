@@ -11,7 +11,7 @@ def create_app():
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = 'ew342f2f23mb4'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+    app.conﬁg['SQLALCHEMY_DATABASE_URI'] ='mysql+pymysql://root:88uUheEWfk3@localhost/db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
