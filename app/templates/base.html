@@ -36,7 +36,7 @@
         </form>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="#" class="nav-link px-2 link-secondary">Login</a></li>
+          <li><a href="{{url_for('auth.login')}}" class="nav-link px-2 link-secondary">Login</a></li>
           <li><a href="{{url_for('auth.signup')}}" class="nav-link px-2 link-dark">Sign-up</a></li>
         </ul>
 
@@ -61,7 +61,6 @@
   <div class="container">
       {% for message in get_flashed_messages() %}
       <div class="alert alert-warning">
-  
           {{ message }}
       </div>
       {% endfor %}
