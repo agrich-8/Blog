@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for,flash, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
+from datetime import datetime
 from .models import User, SignUpForm, LoginForm
 from . import db
 
@@ -112,7 +113,7 @@ def signup():
                 method='pbkdf2:sha256',
                 salt_length=8
             )
-            new_user = User(email=email, name=name, password=hash)
+            new_user = User(email=email, name=name, hash=hash, token='qwerty1233', created=str(datetime.now(tz=None))[:19])
             db.session.add(new_user)
             db.session.commit()
 
