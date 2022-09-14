@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 # login_manager = LoginManager()
@@ -13,8 +13,11 @@ def create_app():
     app.config['SECRET_KEY'] = 'ew342f2f23mb4'
     app.conﬁg['SQLALCHEMY_DATABASE_URI'] ='mysql+pymysql://root:88uUheEWfk3@localhost/db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config["JWT_SECRET_KEY"] = "super-secret"
 
     db.init_app(app)
+
+    jwt = JWTManager(app)
     
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'

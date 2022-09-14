@@ -1,10 +1,15 @@
-from enum import unique
-from xmlrpc.client import DateTime
-from . import db
+from flask import jsonify
 from flask_login import UserMixin
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, BooleanField
-from wtforms.validators import DataRequired
+from flask import current_app
+
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
+
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+
+from . import db
 
 class User(UserMixin, db.Model):
 
@@ -12,7 +17,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     name = db.Column(db.String(44), unique=True)
     email = db.Column(db.String(44), unique=True)
-    is_confirmed = db.Column(db.Boolean)
+    is_confirmed = db.Column(db.Boolean) # можно добавить default=False
     hash = db.Column(db.String(44))
     role = db.Column(db.String(44))
     token = db.Column(db.String(254), unique=True)
@@ -20,6 +25,29 @@ class User(UserMixin, db.Model):
     created = db.Column(db.DateTime)
     path = db.Column(db.String(254))
 
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute') 
+
+    @password.setter
+    def password(self, password):
+        self.hash = generate_password_hash(
+                        password,
+                        method='pbkdf2:sha256',
+                        salt_length=8
+                    ) 
+
+    def verify_password(self, password):
+        return check_password_hash(self.hash, password)
+
+    def generate_conﬁrmation_token(name):
+        access_token = create_access_token(identity=name)
+        return access_token
+
+    # @jwt_required()
+    def confirm():
+        current_user = get_jwt_identity()
+        return jsonify(logged_in_as=current_user)
 
 class Articles(db.Model):
 
@@ -32,18 +60,3 @@ class Articles(db.Model):
     created_at = db.Column(db.DateTime)
     
 
-class SignUpForm(FlaskForm):
-
-    name =  StringField('Name', validators=[DataRequired()])
-    email =  StringField('Email', validators=[DataRequired()])
-    password =  StringField('Password', validators=[DataRequired()])
-    password_repeat = StringField('PasswordRepeat', validators=[DataRequired()])
-    checkbox = BooleanField('CheckBox', validators=[DataRequired()])
-    submit = SubmitField('Register')
-
-class LoginForm(FlaskForm):
-
-    email =  StringField('Email', validators=[DataRequired()])
-    password =  StringField('Password', validators=[DataRequired()])
-    checkbox = BooleanField('CheckBox', validators=[DataRequired()])
-    submit = SubmitField('Login')
