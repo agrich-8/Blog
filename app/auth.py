@@ -26,6 +26,10 @@ def login():
             if user:
                 if user.verify_password(password):
                     login_user(user, remember=remember)
+                    # send_email(user.email, 'Confirm Your Account',
+                    #             'auth/email/confirm', user=user,
+                    #             token=token)
+                    flash('A confirmation email has been sent to you by email.')
                     return redirect(url_for('main.profile'))
                 else:
                     flash('Please enter the password you provided on sign up')
