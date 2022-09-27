@@ -141,7 +141,6 @@ def confirm(token):
     return 'ты лох'
 
 
-
 @auth.route('/logout')
 @login_required
 def logout():
