@@ -1,6 +1,16 @@
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for,flash, request
-from flask_login import login_user, logout_user, login_required, current_user
+
+from flask import Blueprint
+from flask import render_template
+from flask import redirect
+from flask import url_for
+from flask import flash
+from flask import request
+
+from flask_login import login_user
+from flask_login import logout_user
+from flask_login import login_required
+from flask_login import current_user
 
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
@@ -44,12 +54,8 @@ def signup():
             if user:
                 flash('Email address already exists')
                 return redirect(url_for('auth.signup'))
-            # hash = generate_password_hash(
-            #     password,
-            #     method='pbkdf2:sha256',
-            #     salt_length=8
-            # )
-            token = User.generate_confirmation_token(current_user.name)
+
+            token = User.generate_confirmation_token(name)
             new_user = User(email=email, name=name, password=password, token='tk', created=str(datetime.now(tz=None))[:19])
             db.session.add(new_user)
             db.session.commit()
@@ -57,18 +63,23 @@ def signup():
                 'auth/email/confirm', user=new_user.name,
                 token=token)
             return redirect(url_for('auth.login'))
+
         elif not name:
             flash('Name is not specified, please try again.')
             return redirect(url_for('auth.signup'))
+
         elif not email:
             flash('Email is not specified, please try again.')
             return redirect(url_for('auth.signup'))
+
         elif not password:
             flash('Password is not specified, please try again.')
             return redirect(url_for('auth.signup'))
+
         elif not checkbox:
             flash('You must accept the terms of the agreement')
             return redirect(url_for('auth.signup'))
+
     return render_template('signup.html', form=form, name=name, email=email,
                             password=password, password_repeat=password_repeat, checkbox=checkbox
                             )
@@ -116,17 +127,20 @@ def login():
                             )
 
 
-@auth.route('/conrirm/<token>')
+@auth.route('/conrirm/<token>', methods=['GET'])
 @login_required
 def confirm(token):
-    if current_user.confirmed:
+    print('функция шлюхи')
+    if current_user.is_confirmed:
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
-        db.session.commit()
+        # db.session.commit()
         flash('You have confirmed your account. Thanks!')
     else:
         flash('The confirmation link is invalid or has expired.')
-    return redirect(url_for('main.index'))
+    return 'ты лох'
+
+
 
 @auth.route('/logout')
 @login_required

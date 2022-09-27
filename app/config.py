@@ -1,12 +1,15 @@
 import os
-
+from datetime import timedelta
 class Config:
     
     SECRET_KEY = 'ew342f2f23mb4'
+
     SQLALCHEMY_DATABASE_URI ='mysql+pymysql://root:88uUheEWfk3@localhost/db'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     JWT_SECRET_KEY = "super-secret"
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=60)   # token will expire in 60 min
 
     def init_app(app):
         pass

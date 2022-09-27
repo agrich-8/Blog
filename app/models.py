@@ -7,9 +7,11 @@ from werkzeug.security import check_password_hash
 
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import decode_token
 from flask_jwt_extended import jwt_required
 
 from . import db
+from . import login_manager
 
 class User(UserMixin, db.Model):
 
@@ -41,13 +43,13 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.hash, password)
 
     def generate_conﬁrmation_token(name):
-        access_token = create_access_token(identity=name)
+        access_token = create_access_token(identity=name) 
         return access_token
 
-    # @jwt_required()
-    def confirm():
-        current_user = get_jwt_identity()
-        return jsonify(logged_in_as=current_user)
+
+    def confirm(self, token):
+        print('сюда блять')
+        return decode_token(token)['sub'] == self.name
 
 class Articles(db.Model):
 
@@ -60,3 +62,6 @@ class Articles(db.Model):
     created_at = db.Column(db.DateTime)
     
 
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
