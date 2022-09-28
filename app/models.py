@@ -6,9 +6,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
 from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import decode_token
-from flask_jwt_extended import jwt_required
 
 from . import db
 from . import login_manager
@@ -46,10 +44,14 @@ class User(UserMixin, db.Model):
         access_token = create_access_token(identity=name) 
         return access_token
 
-
     def confirm(self, token):
-        print('сюда блять')
-        return decode_token(token)['sub'] == self.name
+        print('\033[32m token', token)
+        print('\033[32m decode', decode_token(token))
+        if decode_token(token)['sub'] == self.name:
+            self.is_confirmed = True
+            db.session.add(self)
+            return True
+
 
 class Articles(db.Model):
 

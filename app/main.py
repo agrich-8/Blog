@@ -5,15 +5,21 @@ from flask_jwt_extended import jwt_required
 from .models import User
 from .email import send_email
 from . import db
+from colorama import init, Fore
 
+init()
 main = Blueprint('main', __name__)
 
 @main.route('/')
+@login_required
 def index():
+    print(Fore.GREEN+'index'+Fore.RESET)
+
     return render_template('index.html')
 
 @main.route('/profile')
 @login_required
+@jwt_required()
 def profile():
     token = User.generate_confirmation_token(current_user.name)
     send_email('alex.go.888.1@gmail.com', 'Confirm Your Account',

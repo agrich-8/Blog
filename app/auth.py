@@ -1,4 +1,6 @@
 from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 
 from flask import Blueprint
 from flask import render_template
@@ -13,10 +15,11 @@ from flask_login import login_required
 from flask_login import current_user
 
 from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
-from flask_jwt_extended import JWTManager
-# from flask_jwt_extended import current_user as current_user_jwt
+from flask_jwt_extended import set_access_cookies
+from flask_jwt_extended import unset_access_cookies
 
 from .models import User
 from .forms import SignUpForm, LoginForm
@@ -25,6 +28,19 @@ from . import db
 
 auth = Blueprint('auth', __name__)
 
+@auth.after_request
+def refresh_expiring_jwts(response):
+    try:
+        exp_timestamp = get_jwt()["exp"]
+        now = datetime.now(timezone.utc)
+        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+        if target_timestamp > exp_timestamp:    # already expired or expires within 30 minutes
+            access_token = create_access_token(identity=get_jwt_identity())
+            set_access_cookies(response, access_token)
+        return response
+    except (RuntimeError, KeyError):
+        # Case where there is not a valid JWT. Just return the original response
+        return response
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -104,12 +120,12 @@ def login():
             if user:
                 if user.verify_password(password):
                     login_user(user, remember=remember)
-                    # send_email(user.email, 'Confirm Your Account',
-                    #             'auth/email/confirm', user=user,
-                    #             token=token)
-                    
                     flash('A confirmation email has been sent to you by email.')
-                    return redirect(url_for('main.profile'))
+
+                    response = redirect(url_for('main.profile'))
+                    access_token = create_access_token(identity=email)
+                    set_access_cookies(response, access_token)
+                    return response
                 else:
                     flash('Please enter the password you provided on sign up')
                     return redirect(url_for('auth.login'))
@@ -134,8 +150,9 @@ def confirm(token):
     if current_user.is_confirmed:
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
-        # db.session.commit()
+        db.session.commit()
         flash('You have confirmed your account. Thanks!')
+        return 'working'
     else:
         flash('The confirmation link is invalid or has expired.')
     return 'ты лох'
@@ -143,6 +160,9 @@ def confirm(token):
 
 @auth.route('/logout')
 @login_required
+@jwt_required()
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    response = redirect(url_for('main.index'))
+    unset_access_cookies(response)
+    return response
