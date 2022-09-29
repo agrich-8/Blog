@@ -20,7 +20,7 @@ class User(UserMixin, db.Model):
     is_confirmed = db.Column(db.Boolean) # можно добавить default=False
     hash = db.Column(db.String(44))
     role = db.Column(db.String(44))
-    token = db.Column(db.String(254), unique=True)
+    token = db.Column(db.String(1000), unique=True)
     online = db.Column(db.DateTime)
     created = db.Column(db.DateTime)
     path = db.Column(db.String(254))
@@ -40,9 +40,19 @@ class User(UserMixin, db.Model):
     def verify_password(self, password):
         return check_password_hash(self.hash, password)
 
-    def generate_conﬁrmation_token(name):
-        access_token = create_access_token(identity=name) 
-        return access_token
+    @property
+    def token(self):
+        return(self.token)
+
+    @token.setter
+    def token(self, email):
+        self.token = create_access_token(identity=email)
+
+
+    def generate_conﬁrmation_token(self, name):
+        token = create_access_token(identity=self.name)
+        self.token = token
+        return token
 
     def confirm(self, token):
         print('\033[32m token', token)

@@ -28,6 +28,7 @@ from . import db
 
 auth = Blueprint('auth', __name__)
 
+'''
 @auth.after_request
 def refresh_expiring_jwts(response):
     try:
@@ -41,6 +42,7 @@ def refresh_expiring_jwts(response):
     except (RuntimeError, KeyError):
         # Case where there is not a valid JWT. Just return the original response
         return response
+'''
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -71,8 +73,8 @@ def signup():
                 flash('Email address already exists')
                 return redirect(url_for('auth.signup'))
 
-            token = User.generate_confirmation_token(name)
             new_user = User(email=email, name=name, password=password, token='tk', created=str(datetime.now(tz=None))[:19])
+            token = User.generate_confirmation_token(name)
             db.session.add(new_user)
             db.session.commit()
             send_email(new_user.email, 'Confirm Your Account',
@@ -160,7 +162,6 @@ def confirm(token):
 
 @auth.route('/logout')
 @login_required
-@jwt_required()
 def logout():
     logout_user()
     response = redirect(url_for('main.index'))
