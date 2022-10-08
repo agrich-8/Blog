@@ -14,13 +14,6 @@ from flask_login import logout_user
 from flask_login import login_required
 from flask_login import current_user
 
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import set_access_cookies
-from flask_jwt_extended import unset_access_cookies
-
 from .models import User
 from .forms import SignUpForm, LoginForm
 from .email import send_email
@@ -28,25 +21,24 @@ from . import db
 
 auth = Blueprint('auth', __name__)
 
-'''
-@auth.after_request
-def refresh_expiring_jwts(response):
-    try:
-        exp_timestamp = get_jwt()["exp"]
-        now = datetime.now(timezone.utc)
-        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
-        if target_timestamp > exp_timestamp:    # already expired or expires within 30 minutes
-            access_token = create_access_token(identity=get_jwt_identity())
-            set_access_cookies(response, access_token)
-        return response
-    except (RuntimeError, KeyError):
-        # Case where there is not a valid JWT. Just return the original response
-        return response
-'''
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.ping()
+        if current_user.is_confirmed \
+            and request.endpoint[:5] != 'auth.':
+            return redirect(url_for('auth.unconfirmed'))
+
+@auth.route('/unconfirmed')
+def unconfirmed():
+    if current_user.is_anonymous() or current_user.is_confirmed:
+        return redirect ('main.index')
+    return render_template('auth.unconfirmed.html')
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
     name = None
+    login = None
     email = None
     password = None
     password_repeat = None
@@ -56,10 +48,12 @@ def signup():
         if form.validate_on_submit():
             print("xyu")
             name = form.name.data
+            login = form.login.data
             email = form.email.data
             password = form.password.data
             password_repeat = form.password_repeat.data
             checkbox = form.checkbox.data
+            form.login.data = ''
             form.name.data = ''
             form.email.data = ''
             form.password.data = ''
@@ -73,16 +67,17 @@ def signup():
                 flash('Email address already exists')
                 return redirect(url_for('auth.signup'))
 
-            new_user = User(email=email, name=name, password=password, token='tk', created=str(datetime.now(tz=None))[:19])
-            token = User.generate_confirmation_token(name)
+            new_user = User(email=email, login=login, password=password, name=name, \
+                             set_token=email, created=str(datetime.now(tz=None))[:19])
             db.session.add(new_user)
             db.session.commit()
             send_email(new_user.email, 'Confirm Your Account',
-                'auth/email/confirm', user=new_user.name,
-                token=token)
-            return redirect(url_for('auth.login'))
+                'auth/email/confirm', user=new_user.login,
+                token=new_user.token)
+            flash('A confirmation email has been sent to you by email.')
+            return redirect(url_for('auth.login/'))
 
-        elif not name:
+        elif not login:
             flash('Name is not specified, please try again.')
             return redirect(url_for('auth.signup'))
 
@@ -98,7 +93,7 @@ def signup():
             flash('You must accept the terms of the agreement')
             return redirect(url_for('auth.signup'))
 
-    return render_template('signup.html', form=form, name=name, email=email,
+    return render_template('signup.html', form=form, login=login, email=email,
                             password=password, password_repeat=password_repeat, checkbox=checkbox
                             )
 
@@ -122,11 +117,7 @@ def login():
             if user:
                 if user.verify_password(password):
                     login_user(user, remember=remember)
-                    flash('A confirmation email has been sent to you by email.')
-
-                    response = redirect(url_for('main.profile'))
-                    access_token = create_access_token(identity=email)
-                    set_access_cookies(response, access_token)
+                    response = redirect(url_for('main.index'))
                     return response
                 else:
                     flash('Please enter the password you provided on sign up')
@@ -159,11 +150,20 @@ def confirm(token):
         flash('The confirmation link is invalid or has expired.')
     return 'ты лох'
 
+@auth.route('/confirm')
+@login_required
+def resend_confirmation():
+    token = current_user.generate_confirmation_token()
+    send_email(current_user.email, 'Confirm Your Account',
+                'auth/email/confirm', user=current_user.login,
+                token=current_user.token)
+    flash('A new conﬁ rmation email has been sent to you by email.')
+    return redirect(url_for('main.index'))
+
 
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
-    response = redirect(url_for('main.index'))
-    unset_access_cookies(response)
-    return response
+
+    return redirect(url_for('main.index'))

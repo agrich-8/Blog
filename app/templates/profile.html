@@ -1,8 +1,84 @@
 {% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css')}}">
+{% endblock %}
+
 {% block content %}
 
-<div class="container">
-  <h1 class="title">Welcome, {{name}}!</h1>
-  <h1 class="title">Welcome, {{retok}}!</h1>
+<div class="'row">
+    <div class="col">
+
+    </div>
+    <div class="col">
+
+    </div>
+<div class="container text-center">
+
+    <section class="colored-section" id="title">
+
+        <div class="container-fluid">    
+          <div class="row justify-content-around">
+            <div class="col-lg-3">
+                <div class="profile-header-img">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width=80% height=80% alt="" />
+                </div>
+                <div>
+                    <h1>{{ user.name }}</h1>
+                    <div class="font-weight-600 mb-3 text-muted mt-n2">{{ user.login }}</div>
+                    <button type="button" class="btn btn-outline-secondary">Secondary</button>
+                    {% if current_user.is_administrator() %}
+                    <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p> 
+                    {% endif %}
+                    {% if user.about_me %}
+                    <p>{{ user.about_me }}</p>
+                    {% endif %}
+                </div>
+                
+
+                    <ul class="list-group">
+                        <li class="list-group-item">Элемент</li>
+                        <li class="list-group-item">Второй элемент</li>
+                        <li class="list-group-item">Третий элемент</li>
+                        <li class="list-group-item">Четвертый элемент</li>
+                        <li class="list-group-item">И пятый</li>
+                      </ul>
+            </div>
+    
+            <div class="col-lg-9">
+                <ul class="profile-header-tab nav nav-tabs nav-tabs-v2">
+                    <li class="nav-item">
+                        <a href="#profile-post" class="nav-link" data-toggle="tab">
+                            <div class="nav-field">Posts</div>
+                            <div class="nav-value">382</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#profile-followers" class="nav-link active" data-toggle="tab">
+                            <div class="nav-field">Followers</div>
+                            <div class="nav-value">1.3m</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#profile-followers" class="nav-link" data-toggle="tab">
+                            <div class="nav-field">Following</div>
+                            <div class="nav-value">2,592</div>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Элемент</li>
+                    <li class="list-group-item">Второй элемент</li>
+                    <li class="list-group-item">Третий элемент</li>
+                    <li class="list-group-item">Четвертый элемент</li>
+                    <li class="list-group-item">И пятый</li>
+                  </ul>
+            </div>
+    
+          </div>
+    
+        </div>
+    
+      </section>
 </div>
 {% endblock %}
+

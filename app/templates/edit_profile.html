@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css')}}">
+{% endblock %}
+
+{% block content %}
+
+<div class="card text-black" style="border-radius: 25px;">
+
+    <div class="container text-center">
+
+        <section class="colored-section" id="title">
+
+            <div class="container-fluid">    
+                <div class="row justify-content-center">
+                    <div class="col-sm-3 my-5 px-3">
+                        <div class="profile-header-img">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width=80% height=80% alt="" />
+                        </div>
+                        <div>
+                            <h1>{{ user.name }}</h1>
+                            <div class="font-weight-600 mb-3 text-muted mt-n2">{{ user.login }}</div>
+                            <button type="button" class="btn btn-outline-secondary">Secondary</button>
+                            {% if current_user.is_administrator() %}
+                            <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p> 
+                            {% endif %}
+                            {% if user.about_me %}
+                            <p>{{ user.about_me }}</p>
+                            {% endif %}
+                        </div>
+                        
+
+                            <ul class="list-group">
+                                <li class="list-group-item">Элемент</li>
+                                <li class="list-group-item">Второй элемент</li>
+                                <li class="list-group-item">Третий элемент</li>
+                                <li class="list-group-item">Четвертый элемент</li>
+                                <li class="list-group-item">И пятый</li>
+                            </ul>
+                    </div>
+                    
+                        <div class="col-sm-8">
+                            
+                            <div class="row">
+                                <div class="'col">
+                                    <p class="h5">Name</p>
+                                    <p class="h5">Login</p>
+                                    <p class="h5">Email</p>
+                                    <p class="h5">Password</p>
+                                </div>
+                                <div class="'col">
+                                    <p class="h5">NameVal</p>
+                                    <p class="h5">LoginVal</p>
+                                    <p class="h5">EmailVal</p>
+                                    <p class="h5">PasswordVal</p>
+                                </div>
+                                <div class="'col">
+                                    <p>
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapseExample">
+                                        Кнопка с data-target
+                                        </button>
+                                    </p>
+                                    
+                                    <div class="collapse multi-collapse" id="collapse1">
+                                        <div class="d-flex flex-row align-items-center mb-4">
+                                            <i class="fas fa-user fa-lg fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                {{ form.name(type="text", id="form3Example1c", class="form-control") }}
+                                                <label class="form-label" for="form3Example1c">Your Name</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   
+                                    <p>
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapseExample">
+                                        Кнопка с data-target
+                                        </button>
+                                    </p>
+                                    <div class="collapse" id="collapse2">
+                                        <div class="d-flex flex-row align-items-center mb-4">
+                                            <i class="fas fa-user fa-lg fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                {{ form.login(type="text", id="form3Example1c", class="form-control") }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p>
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapseExample">
+                                        Кнопка с data-target
+                                        </button>
+                                    </p>
+                                    <div class="collapse" id="collapse3">
+                                        <div class="d-flex flex-row align-items-center mb-4">
+                                            <i class="fas fa-user fa-lg fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                {{ form.email(type="text", id="form3Example1c", class="form-control") }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p>
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapseExample">
+                                        Кнопка с data-target
+                                        </button>
+                                    </p>
+                                    <div class="collapse" id="collapse4">
+                                        <div class="d-flex flex-row align-items-center mb-4">
+                                            <i class="fas fa-user fa-lg fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                {{ form.password(type="text", id="form3Example1c", class="form-control") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{ form.csrf_token }}
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<form method="POST"></form>
+{% endblock %}
+

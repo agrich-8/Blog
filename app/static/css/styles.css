@@ -26,6 +26,9 @@
     justify-content: space-between;
     padding: var(--bs-navbar-padding-y) var(--bs-navbar-padding-x);
 }
+
+
+
 .navbar-color{
     --bs-navbar-color: rgb(0 119 197 / 61%);
     --bs-navbar-hover-color: rgb(231 19 19 / 75%);
@@ -41,6 +44,7 @@
 user agent stylesheet
 header {
     display: block;
+    z-index: 99999 !important;
 }
 body {
     margin: 0;
