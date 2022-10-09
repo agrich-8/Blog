@@ -8,8 +8,11 @@ class Config:
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    JWT_SECRET_KEY = "super-secret"
+    JWT_SECRET_KEY = 'super-secret'
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=60)   # token will expire in 60 min
+
+    UPLOAD_FOLDER = 'app\static\images'
+    
 
     def init_app(app):
         pass

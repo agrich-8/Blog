@@ -30,7 +30,9 @@
                     <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p> 
                     {% endif %}
                     {% if user.about_me %}
-                    <p>{{ user.about_me }}</p>
+                    <div class="card text-black" style="border-radius: 25px;">
+                        <div class="font-weight-600 mb-3 text-muted mt-n2">{{ user.about_me }}</div>
+                    </div>
                     {% endif %}
                 </div>
                 

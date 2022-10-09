@@ -47,7 +47,7 @@ header {
     z-index: 99999 !important;
 }
 body {
-    margin: 0;
+
     font-family: var(--bs-body-font-family);
     font-size: var(--bs-body-font-size);
     font-weight: var(--bs-body-font-weight);
