@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+
 class Config:
     
     SECRET_KEY = 'ew342f2f23mb4'
@@ -12,7 +13,6 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=60)   # token will expire in 60 min
 
     UPLOAD_FOLDER = 'app\static\images'
-    
 
     def init_app(app):
         pass

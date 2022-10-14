@@ -46,7 +46,6 @@ def signup():
     form = SignUpForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            print("xyu")
             name = form.name.data
             login = form.login.data
             email = form.email.data
@@ -75,7 +74,7 @@ def signup():
                 'auth/email/confirm', user=new_user.login,
                 token=new_user.token)
             flash('A confirmation email has been sent to you by email.')
-            return redirect(url_for('auth.login/'))
+            return redirect(url_for('auth.login'))
 
         elif not login:
             flash('Name is not specified, please try again.')
@@ -106,7 +105,6 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            print("xyu")
             email = form.email.data
             password = form.password.data
             remember = True if form.checkbox.data else False
@@ -139,7 +137,6 @@ def login():
 @auth.route('/conrirm/<token>', methods=['GET'])
 @login_required
 def confirm(token):
-    print('функция шлюхи')
     if current_user.is_confirmed:
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
@@ -148,7 +145,7 @@ def confirm(token):
         return 'working'
     else:
         flash('The confirmation link is invalid or has expired.')
-    return 'ты лох'
+    return 'not working'
 
 @auth.route('/confirm')
 @login_required

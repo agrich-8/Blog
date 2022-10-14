@@ -4,12 +4,14 @@ from wtforms import StringField
 from wtforms import SubmitField
 from wtforms import BooleanField
 from wtforms import PasswordField
+from wtforms import TextAreaField
 from wtforms import ValidationError
 
 from wtforms.validators import DataRequired 
 from wtforms.validators import Length
 from wtforms.validators import Regexp
 from wtforms.validators import EqualTo
+from wtforms.validators import InputRequired
 from wtforms.validators import Email
 
 
@@ -62,3 +64,12 @@ class EditForm(FlaskForm):
     password =  PasswordField('Password', validators=[Length(0, 33)])
     about_me = StringField('AboutMe', validators=[Length(0, 330)])
     submit = SubmitField('Confirm')
+
+class ArticleForm(FlaskForm):
+
+    heading = StringField('Title', validators=[InputRequired(), Length(max=100)])
+    text = TextAreaField('Post')
+    tags = StringField('Tags')
+    description = TextAreaField('Description')
+    draft = BooleanField('Draft')
+    submit = SubmitField('   Submit Article   ')

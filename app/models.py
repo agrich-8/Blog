@@ -28,6 +28,8 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(64))
     location = db.Column(db.String(255))
     about_me = db.Column(db.Text())
+
+    articles = db.relationship('Article', backref='user', lazy='dynamic')
  
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -88,6 +90,7 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User %r>' % self.login
 
+
 class Role(db.Model):
     
     __tablename__ = 'roles'
@@ -95,6 +98,7 @@ class Role(db.Model):
     login = db.Column(db.String(64), unique=True)
     default = db.Column(db.Boolean, default=False, index=True) 
     permissions = db.Column(db.Integer)
+
     users = db.relationship('User', backref='role', lazy='dynamic')
 
     @staticmethod
@@ -121,12 +125,14 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.login
 
+
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
         return False
 
     def is_administrator(self): 
       return False
+      
 
 login_manager.anonymous_user = AnonymousUser
 class Permission:
@@ -136,15 +142,17 @@ class Permission:
     MODERATE_COMMENTS = 0x08
     ADMINISTER = 0x08
 
-class Articles(db.Model):
+
+class Article(db.Model):
 
     __tablename__ = 'articles'
     id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer)
-    login = db.Column(db.String(254))
-    text = db.Column(db.String(254))
-    path = db.Column(db.String(254))
-    created_at = db.Column(db.DateTime)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    text = db.Column(db.Text)
+    path = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    description = db.Column(db.Text)
+    article_name = db.Column(db.String(100))
     
 
 @login_manager.user_loader

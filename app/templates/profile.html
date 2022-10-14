@@ -1,7 +1,5 @@
 {% extends "base.html" %}
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css')}}">
-{% endblock %}
+{% block title %}Profile {% endblock %}
 
 {% block content %}
 
@@ -20,12 +18,15 @@
           <div class="row justify-content-around">
             <div class="col-lg-3">
                 <div class="profile-header-img">
-                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width=80% height=80% alt="" />
+                    {% if user.path %}
+                        <img src="{{ url_for('static', filename=user.path) }}" width=80% height=80% alt="" style="border-radius: 25px;" />
+                    {% else %}
+                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width=80% height=80% alt="" />
+                    {% endif %}
                 </div>
                 <div>
                     <h1>{{ user.name }}</h1>
                     <div class="font-weight-600 mb-3 text-muted mt-n2">{{ user.login }}</div>
-                    <button type="button" class="btn btn-outline-secondary">Secondary</button>
                     {% if current_user.is_administrator() %}
                     <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p> 
                     {% endif %}
@@ -36,14 +37,15 @@
                     {% endif %}
                 </div>
                 
+                <button type="button" class="btn btn-outline-secondar my-3">Secondary</button>
 
-                    <ul class="list-group">
-                        <li class="list-group-item">Элемент</li>
-                        <li class="list-group-item">Второй элемент</li>
-                        <li class="list-group-item">Третий элемент</li>
-                        <li class="list-group-item">Четвертый элемент</li>
-                        <li class="list-group-item">И пятый</li>
-                      </ul>
+                <ul class="list-group">
+                    <li class="list-group-item">Элемент</li>
+                    <li class="list-group-item">Второй элемент</li>
+                    <li class="list-group-item">Третий элемент</li>
+                    <li class="list-group-item">Четвертый элемент</li>
+                    <li class="list-group-item">И пятый</li>
+                    </ul>
             </div>
     
             <div class="col-lg-9">

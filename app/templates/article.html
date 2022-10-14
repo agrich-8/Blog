@@ -1,0 +1,8 @@
+{% block content %}
+{{ article_text }}
+<p id="'one">sdc</p>
+<script>
+    var d1 = document.getElementById('one');
+    d1.insertAdjacentHTML('afterend', '<div id="two">two</div>');
+  </script>
+{% endblock %}
