@@ -40,7 +40,7 @@ def load_img(file):
     if file.filename == '':
         raise NameError("''")
     if file and allowed_file(filename):
-        new_filename = str(uuid.uuid4()) + filename + filename[filename.rfind('.'):]
+        new_filename = str(uuid.uuid4()) + filename[filename.rfind('.'):]
         img_fullpath = os.path.join(current_app.config['UPLOAD_FOLDER'], new_filename)
         file.save(img_fullpath)
         return {'filename' : new_filename, 
@@ -93,12 +93,12 @@ def create_article():
         article_name = heading + str(uuid.uuid4())
         article_path = f'app/static/articlesText/{article_name}.html'
 
-        with open(article_path, 'w+') as file:
+        with open(article_path, 'w+', encoding="utf-8") as file:
             file.write(text)
         
         article = Article(author_id=current_user.id, path=article_path, 
                         created_at=str(datetime.now(tz=None))[:19],
-                        description=description, article_name=article_name)
+                        description=description, article_name=article_name, heading=heading)
         db.session.add(article)
         db.session.commit()
         return redirect(url_for('main.article', article_name=article_name))
@@ -107,14 +107,12 @@ def create_article():
 
 @main.route('/article/<article_name>', methods=['GET'])
 def article(article_name):
-    print(article_name)
     article = Article.query.filter_by(article_name=article_name).first()
-    with open(article.path, 'r+') as file:
-        article_text = file.read()
+    user = current_user
+    print(user.path)
     
-
-
-    return render_template('article.html', article_text=article_text)
+    return render_template('article.html', user=user, article=article,
+                            article_path=article.path[3:]) #, name=url_for('static', filename=f'articlesText/{article_name}'))
 
 
 @main.route('/edit_profile', methods=['GET', 'POST'])
@@ -154,10 +152,10 @@ def edit_user():
             db.session.commit()
         file = request.files['file']
         try:
-            path = load_img(file)['path']
+            filename = load_img(file)['filename']
         except:
             flash('Name Error')
-        user.path = path
-        print(form.errors)
+        user.path = f'app/static/images/{filename}'
+    print(current_user.path)
 
     return render_template('edit_user.html', user=current_user, form=form)

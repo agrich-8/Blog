@@ -45,8 +45,11 @@
             </div>
         </div>
     </div>
-
-    {{ form.text(type="text", id="article", class="form-control") }}
+    <div class="row justify-content-center">
+        <div class="col-sm-10"> 
+            {{ form.text(type="text", id="article", class="form-control") }}
+        </div>
+    </div>
     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4" id="sendimg">
         {{ form.submit(class="btn btn-dark my-4", id="sendimg") }}
     </div>
@@ -57,13 +60,13 @@
 <script type="text/javascript">
     tinymce.init({
         selector: '#article',
-        plugins: [
-            'advlist autolink link image imagetools lists charmap print preview hr anchor pagebreak spellchecker',
-            'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
-            'save table contextmenu directionality template paste textcolor codesample'
-        ],
+        // language: 'ru',
+        // inline: true,
+        plugins: 'autoresize preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+        // indent_use_margin: true, 
+
         imagetools_toolbar: "rotateleft rotateright | flipv fliph | editimage imageoptions",
-        toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons | codesample',
+        toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | charmap emoticons | fullscreen  preview print | insertfile image link codesample | ltr rtl',
         images_upload_url: '{{ url_for("main.imageuploader") }}',
         automatic_uploads: false,
         images_reuse_filename: false,
@@ -75,7 +78,9 @@
             { text: 'Processing', value: 'processing' },
             { text: 'Python', value: 'python' }
         ],
-        width: "100%",
+        width: "80%",
+        min_height: 700
+        
     });
 </script>
 <script>

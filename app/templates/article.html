@@ -1,8 +1,96 @@
+{% extends "base.html" %}
 {% block content %}
-{{ article_text }}
-<p id="'one">sdc</p>
+
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="bg-light rounded">
+        </div>
+        
+        <div>
+            <h1 class="display-3 fst-italic text-break">{{ article.heading }}</h1>
+        </div>
+
+        <div class="bg-light px-4 py-4 rounded">
+            <p display-1><div class="text-break" w3-include-html="{{ article_path }}"></div></p>
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+        <div class="position-sticky card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="p-1  bg-light rounded">
+                            {% if user.path %}
+                                <img src="{{ user.path }}" width=80% height=80% alt="" style="border-radius: 5px;" />
+                            {% else %}
+                                <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width=60 height=60 alt="" />
+                            {% endif %} 
+                                  
+                        </div>
+                    </div>
+                    
+                    <div class="col">
+                        <div class="row display-6 card-text">
+                            <a href="{{ url_for('main.profile') }}" class="stretched-link nav-link" style="position: relative;">{{ user.name }} 
+                                
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="row text-muted">
+                            {{ user.login }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if article.description %}
+            <div class="card-body">
+                <h4 class="fst-italic">Description</h4>
+                <p class="mb-0">{{ article.description }}</p>
+            {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
 <script>
-    var d1 = document.getElementById('one');
-    d1.insertAdjacentHTML('afterend', '<div id="two">two</div>');
-  </script>
+    function includeHTML() {
+      var z, i, elmnt, file, xhttp;
+      /*loop through a collection of all HTML elements:*/
+      z = document.getElementsByTagName("*");
+      for (i = 0; i < z.length; i++) {
+        elmnt = z[i];
+        /*search for elements with a certain atrribute:*/
+        file = elmnt.getAttribute("w3-include-html");
+        if (file) {
+          /*make an HTTP request using the attribute value as the file name:*/
+          xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+              if (this.status == 200) {elmnt.innerHTML = this.responseText;}
+              if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
+              /*remove the attribute, and call this function once more:*/
+              elmnt.removeAttribute("w3-include-html");
+              includeHTML();
+            }
+          }
+          xhttp.open("GET", file, true);
+          xhttp.send();
+          /*exit the function:*/
+          return;
+        }
+      }
+    }
+</script>
+
+<script>
+    includeHTML();
+</script>
 {% endblock %}

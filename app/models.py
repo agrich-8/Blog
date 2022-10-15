@@ -152,8 +152,9 @@ class Article(db.Model):
     path = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     description = db.Column(db.Text)
-    article_name = db.Column(db.String(100))
-    
+    article_name = db.Column(db.String(255))
+    heading = db.Column(db.String(255))
+
 
 @login_manager.user_loader
 def load_user(id):
