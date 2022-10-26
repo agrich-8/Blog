@@ -8,13 +8,17 @@ from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import decode_token
 
+
 from . import db
 from . import login_manager
 
 
+
+
 class User(UserMixin, db.Model):
 
-    __tablename__ = "users"
+    __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True) 
     login = db.Column(db.String(44), unique=True)
     email = db.Column(db.String(44), unique=True)
@@ -28,8 +32,12 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(64))
     location = db.Column(db.String(255))
     about_me = db.Column(db.Text())
-
+    passlen = db.Column(db.Integer)
+    thumb_path = db.Column(db.String(255))
+    
+    art_attitude = db.relationship('UserArtAttitude', backref='user_att', lazy='dynamic')
     articles = db.relationship('Article', backref='user', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
  
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -37,7 +45,9 @@ class User(UserMixin, db.Model):
             if self.email == current_app.conﬁg['FLASKY_ADMIN']: 
                 self.role = Role.query.ﬁlter_by(permissions=0xff).ﬁrst() 
             if self.role is None:
+                print('wwwwwwwwwwwwwwwww')
                 self.role = Role.query.ﬁlter_by(default=True).ﬁrst()
+                print(self.role)
     
     def can(self, permissions):
         return self.role is not None and \
@@ -62,6 +72,8 @@ class User(UserMixin, db.Model):
                         salt_length=8
                     ) 
 
+    # def art_like(self, arlt)
+
     def verify_password(self, password):
         return check_password_hash(self.hash, password)
 
@@ -73,8 +85,8 @@ class User(UserMixin, db.Model):
     def set_token(self, email):
         self.token = create_access_token(identity=email)
 
-    def generate_conﬁrmation_token(self, login):
-        token = create_access_token(identity=self.login)
+    def generate_conﬁrmation_token(self):
+        token = create_access_token(identity=self.email)
         self.token = token
         db.session.add(self)
         return token
@@ -104,11 +116,10 @@ class Role(db.Model):
     @staticmethod
     def insert_roles(): 
         roles = {
-            'User': (Permission.FOLLOW | 
-                     Permission.COMMENT |
+            'LowUser': (Permission.WRITE_ARTICLES, False),
+            'User': (Permission.COMMENT |
                      Permission.WRITE_ARTICLES, True), 
-            'Moderator': (Permission.FOLLOW |
-                        Permission.COMMENT |
+            'Moderator': (Permission.COMMENT |
                         Permission.WRITE_ARTICLES |
                         Permission.MODERATE_COMMENTS, False), 
             'Administrator': (0xff, False)
@@ -136,7 +147,6 @@ class AnonymousUser(AnonymousUserMixin):
 
 login_manager.anonymous_user = AnonymousUser
 class Permission:
-    FOLLOW = 0x01
     COMMENT = 0x02
     WRITE_ARTICLES = 0x04
     MODERATE_COMMENTS = 0x08
@@ -154,8 +164,41 @@ class Article(db.Model):
     description = db.Column(db.Text)
     article_name = db.Column(db.String(255))
     heading = db.Column(db.String(255))
+    cover_path = db.Column(db.String(255))
+    attitude = db.Column(db.Integer, default=0)
+    article_position = db.Column(db.Integer)
+    confirmed = db.Column(db.Boolean, default=False)
+    tags = db.Column(db.String(255))
+
+    comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    # user_attitude = db.relationship('UserArtAttitude', backref='art_att', lazy='dynamic')
+
+
+class UserArtAttitude(UserMixin, db.Model): # модель ассоциации user и article
+    __tablename__ = 'user_art_attitude'
+
+    articles_id = db.Column(db.Integer, db.ForeignKey("articles.id"), primary_key=True)
+    users_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    attitude = db.Column(db.Boolean)
+    art_att = db.relationship('Article', backref='user_attitude')
+    # user_att = db.relationship('User', backref='art_attitude', lazy='dynamic')
+
 
 
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+class Comment(db.Model):
+
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True) 
+    text = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow) 
+    disabled = db.Column(db.Boolean)
+    path = db.Column(db.String(255))
+
+    users_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
+    articles_id = db.Column(db.Integer, db.ForeignKey('articles.id'))
+    
+# db.event.listen(Comment.body, 'set', Comment.on_changed_body)

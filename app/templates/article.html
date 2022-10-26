@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_macros.html" as macros %}
 {% block content %}
 
 
@@ -7,58 +8,256 @@
         <div class="bg-light rounded">
         </div>
         
-        <div>
-            <h1 class="display-3 fst-italic text-break">{{ article.heading }}</h1>
+        <div class="row">
+            <h1 class="display-5 fst-italic text-break">{{ article.heading }}</h1>
         </div>
-
-        <div class="bg-light px-4 py-4 rounded">
-            <p display-1><div class="text-break" w3-include-html="{{ article_path }}"></div></p>
+        {% if article.cover_path %}
+        <div class="row">
+            <img src="{{ url_for('static', filename=article.cover_path) }}" alt="" style="border-radius: 5px;" />
         </div>
-
-    </div>
-
-    <div class="col-md-4">
-        <div class="position-sticky card">
-            <div class="card-header">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="p-1  bg-light rounded">
-                            {% if user.path %}
-                                <img src="{{ user.path }}" width=80% height=80% alt="" style="border-radius: 5px;" />
-                            {% else %}
-                                <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width=60 height=60 alt="" />
-                            {% endif %} 
-                                  
+        {% endif%}
+        <div class="row">
+            <div class="bg-light px-4 py-4 rounded">
+                <p display-1><div class="text-break" w3-include-html="{{ url_for('static', filename=article.path) }}"></div></p>
+            </div>
+        </div>
+        {% if current_user.can(Permission.COMMENT) %}
+        <div class="h4 pb-2 mb-4 border-bottom">
+            <h4 class="fst-italic pt-4">Add comment</h4>
+        </div>
+        <div class="row">
+            <form method="post" enctype=multipart/form-data>
+                <div class="row justify-content-center">
+                    <div class="col-sm-12 justify-content-center"> 
+                        {{ comment_form.text(type="text", id="article", class="form-control") }}
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4" id="sendimg">
+                    {{ comment_form.submit(class="btn btn-outline-secondary my-4", id="sendimg") }}
+                </div>
+                  {{ comment_form.csrf_token }}
+            </form>
+        </div>
+        {% endif %}
+        {% if comments %}
+        <div class="h4 pb-2 mb-4 border-bottom">
+            <h4 class="fst-italic pt-4">Comments</h4>
+        </div>
+        
+        {% for comment in comments %}
+        <div class="card my-3">
+            <div class="position-sticky card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="row card-text align-items-center">
+                                <a href="{{ url_for('main.profile', login=User.query.filter_by(id=comment.users_id).first().login) }}" class="stretched-link nav-link" style="position: relative;">
+                                    <p class="fs-4 px-3">{{ User.query.filter_by(id=comment.users_id).first().login }}
+                                        {% if Role.query.filter_by(id=author.role_id).first().permissions == 255 %} 
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                            </svg>
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="col">
-                        <div class="row display-6 card-text">
-                            <a href="{{ url_for('main.profile') }}" class="stretched-link nav-link" style="position: relative;">{{ user.name }} 
-                                
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
-                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-                                </svg>
-                            </a>
-                        </div>
-                        <div class="row text-muted">
-                            {{ user.login }}
+                </div>
+                <div class="card-body" style="width: 100%;">
+                    <div class="row">
+                        <div class="bg-light px-4 py-1 rounded">
+                            <p display-1><div class="text-break" w3-include-html="{{url_for('static', filename=comment.path) }}"></div></p>
                         </div>
                     </div>
                 </div>
             </div>
-            {% if article.description %}
-            <div class="card-body">
-                <h4 class="fst-italic">Description</h4>
-                <p class="mb-0">{{ article.description }}</p>
-            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="pagination">
+            {{ macros.pagination_widget(pagination, '.article', article_name=article.article_name) }} 
+        </div>  
+        {% endif %}
+    </div>
+    
+
+
+    
+    <div class="col-md-4">
+        <div class="position-sticky" style="top: 2rem;">
+            <div class="p-4 mb-3 bg-light rounded">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <div class="p-1  bg-light rounded">
+                                    {% if author.path %}
+                                        <img src="{{ url_for('static', filename=author.path) }}" width=80% height=80% alt="" style="border-radius: 5px;" />
+                                    {% else %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-emoji-sunglasses" viewBox="0 0 16 16">
+                                        <path d="M4.968 9.75a.5.5 0 1 0-.866.5A4.498 4.498 0 0 0 8 12.5a4.5 4.5 0 0 0 3.898-2.25.5.5 0 1 0-.866-.5A3.498 3.498 0 0 1 8 11.5a3.498 3.498 0 0 1-3.032-1.75zM7 5.116V5a1 1 0 0 0-1-1H3.28a1 1 0 0 0-.97 1.243l.311 1.242A2 2 0 0 0 4.561 8H5a2 2 0 0 0 1.994-1.839A2.99 2.99 0 0 1 8 6c.393 0 .74.064 1.006.161A2 2 0 0 0 11 8h.438a2 2 0 0 0 1.94-1.515l.311-1.242A1 1 0 0 0 12.72 4H10a1 1 0 0 0-1 1v.116A4.22 4.22 0 0 0 8 5c-.35 0-.69.04-1 .116z"/>
+                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-1 0A7 7 0 1 0 1 8a7 7 0 0 0 14 0z"/>
+                                    </svg>
+                                    {% endif %} 
+                                        
+                                </div>
+                            </div>
+                            
+                            <div class="col">
+                                <div class="row display-6 card-text">
+                                    <a href="{{ url_for('main.profile', login=author.login) }}" class="stretched-link nav-link" style="position: relative;">
+                                        {{ author.name }}
+                                        {% if Role.query.filter_by(id=author.role_id).first().permissions == 255 %} 
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                        </svg>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="row text-muted">
+                                    {{ author.login }}
+                                </div>
+                            </div>
+                        
+                        </div>
+                    </div>
+                    {% if article.description %}
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <h4 class="fst-italic">Description</h4>
+                                <p class="mb-0">{{ article.description }}</p>
+                            </li>
+                            <form method="POST">
+                            {% if current_user.can(Permission.MODERATE_COMMENTS) %}
+                            <li class="list-group-item">
+                                {{moder_form.position(class="form-select form-select-sm my-2" )}}
+                                {{moder_form.confirm(class="btn btn-secondary btn-sm")}}
+                                {% if current_user.can(Permission.ADMINISTER) %}
+                                <button class="btn btn-outline-danger btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse">
+                                    Delete Article
+                                </button>
+                                <div class="collapse multi-collapse" id="collapse1">
+                                    <div class="d-flex flex-row align-items-center mb-2">
+                                        <div class="form-outline flex-fill text-center">
+                                            <p>Are you sure?</p>
+                                            {{moder_form.delete(class="btn btn-danger btn-sm")}}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </li>
+                            {% endif %}
+                            {{ moder_form.csrf_token }}
+                            </form>
+                        </ul>
+                    
+                    {% endif %}
+                    <form method="POST">
+                        
+                        <div class="col justify-content-center">
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col-md-5">
+                                    {% if article.attitude > 0%}
+                                    <p class="text-center my-2 fs-5 text-success">
+                                        Rating: {{ article.attitude }}
+                                    </p>
+                                    {% elif article.attitude < 0 %}
+                                    <p class="text-center my-2 fs-5 text-danger">
+                                        Rating: {{ article.attitude }}
+                                    </p>
+                                    {% else %}
+                                    <p class="text-center my-2 fs-5">
+                                        Rating: {{ article.attitude }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col-md-2 align-items-center justify-content-center">
+                                    <div class="row align-items-center justify-content-center">
+                                        {% if UserArtAttitude.query.filter_by(articles_id=article.id, users_id=current_user.id).first().attitude == True %}
+                                        <button type="submit" id="like" name="like" class="btn btn-secondary btn-sm active" value="+">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+                                                <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+                                            </svg>
+                                        </button>
+                                        {% else %}
+                                        <button type="submit" id="like" name="like" class="btn btn-secondary btn-sm" value="+">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+                                                <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+                                            </svg>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-3 justify-content-center">
+                                    <div class="row align-items-center justify-content-center">
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-md-2 justify-content-center">
+                                    <div class="row align-items-center justify-content-center">
+                                        {% if UserArtAttitude.query.filter_by(articles_id=article.id, users_id=current_user.id).first().attitude == False %}
+                                        <button type="submit" id="dislike" name="dislike" class="btn btn-secondary btn-sm active" value="-">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                                            </svg>
+                                        </button>
+                                        {% else %}
+                                        <button type="submit" id="dislike" name="dislike" class="btn btn-secondary btn-sm" value="-">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                                            </svg>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{ att_form.csrf_token }}
+                    </form>
+                </div>
             </div>
-            
         </div>
     </div>
 </div>
 
 
+<script type="text/javascript" src="{{ url_for('static', filename='js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
+<script type="text/javascript">
+    tinymce.init({
+        selector: '#article',
+        // language: 'ru',
+        // inline: true,
+        plugins: 'autoresize preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+        // indent_use_margin: true, 
+
+        imagetools_toolbar: "rotateleft rotateright | flipv fliph | editimage imageoptions",
+        toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | charmap emoticons | fullscreen  preview print | insertfile image link codesample | ltr rtl',
+        images_upload_url: '{{ url_for("main.imageuploader") }}',
+        automatic_uploads: false,
+        images_reuse_filename: false,
+        images_upload_base_path: '/static/images',
+        codesample_languages: [
+            { text: 'HTML/XML', value: 'markup' },
+            { text: 'JavaScript', value: 'javascript' },
+            { text: 'CSS', value: 'css' },
+            { text: 'Processing', value: 'processing' },
+            { text: 'Python', value: 'python' }
+        ],
+        width: "100%",
+        min_height: 300
+        
+    });
+</script>
+
+<script>
+    document.querySelector("#sendimg").addEventListener("click", (evt) => {
+        console.log(tinymce.activeEditor.editorUpload.uploadImages());
+        tinymce.activeEditor.editorUpload.uploadImages()
+    })
+</script>
 
 <script>
     function includeHTML() {

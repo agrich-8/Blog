@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
+from flask_migrate import Migrate
 
 from .config import config
 
@@ -14,6 +15,7 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 jwt = JWTManager()
 bootstrap = Bootstrap()
+migrate = Migrate()
 
 
 def create_app():
@@ -25,6 +27,8 @@ def create_app():
     login_manager.init_app(app)
     jwt.init_app(app)
     bootstrap.init_app(app)
+    migrate.init_app(app, db)
+
 
     from .models import User
 

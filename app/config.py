@@ -14,6 +14,9 @@ class Config:
 
     UPLOAD_FOLDER = 'app\static\images'
 
+    FLASKY_POSTS_PER_PAGE = 4
+    
+    
     def init_app(app):
         pass
 

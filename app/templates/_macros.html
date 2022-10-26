@@ -1,0 +1,36 @@
+{% macro pagination_widget(pagination, endpoint) %} 
+
+<ul class="pagination">
+    <li {% if not pagination.has_prev %} class="page-item disabled"{% endif %}> 
+        <a class="page-link" href="{% if pagination.has_prev %}{{ url_for(endpoint, 
+            page = pagination.page - 1, **kwargs) }}{% else %}#{% endif %}"> 
+            &laquo;
+        </a> 
+    </li class="page-item">
+    {% for p in pagination.iter_pages() %} 
+        {% if p %}
+            {% if p == pagination.page %} 
+            <li class="active">
+                <a class="page-link" href="{{ url_for(endpoint, page = p, **kwargs) }}">{{ p }}</a> 
+            </li>
+            {% else %} 
+            <li>
+                <a class="page-link" href="{{ url_for(endpoint, page = p, **kwargs) }}">{{ p }}</a> 
+            </li>
+            {% endif %} 
+        {% else %}
+        <li class="disabled"><a href="#">&hellip;</a></li> 
+        {% endif %}
+        {% endfor %}
+    <li {% if not pagination.has_next %} class="page-item disabled"{% endif %}> 
+        <a class="page-link" href="{% if pagination.has_next %}{{ url_for(endpoint, 
+            page = pagination.page + 1, **kwargs) }}{% else %}#{% endif %}"> 
+            &raquo;
+        </a> 
+    </li> 
+</ul>
+{% endmacro %}
+
+<div class="btn-group me-2" role="group" aria-label="Вторая группа">
+    <a class="btn btn-secondary" href="#" role="button">Ссылка</a>
+</div>

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% block title %}Profile {% endblock %}
+{% block content %}
+<div class="container text-center">
+    <section class="colored-section" id="title">
+        <div class="container-fluid">    
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 text-start px-3">Line</h1>
+                    {% for art in arts %}
+                        <div class="card my-3">
+                            <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('main.article', article_name=art.article_name) }}" class="stretched-link list-group list-group-flush nav-link" style="position: relative;">
+                                            <p class="fs-4 text-start">{{ art.heading }}</p> 
+                                        </a>
+                                        <a href="{{ url_for('main.article', article_name=art.article_name) }}" class="stretched-link list-group list-group-flush nav-link" style="position: relative;">
+                                            <p class="fs-6 text-start">@{{ User.query.filter_by(id=art.author_id).first().login }}</p> 
+                                        </a>
+                                    </li>
+                                {% if art.cover_path %}
+                                <li class="list-group-item">
+                                    <div class="card" style="width: 100%;">
+                                            <img src="{{ url_for('static', filename=art.cover_path) }}" alt="" style="border-radius: 5px;" />
+                                    </div>
+                                </li>
+                                {% endif%}
+                                {% if art.description %}
+                                <li class="list-group-item">
+                                    <p class="fs-4 fst-italic text-start mb-1">Description</p>
+                                    <p class="fs-5 fw-light fst-italic text-start">{{ art.description }}</p>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                    <div class="pagination">
+                        {{ macros.pagination_widget(pagination, '.line') }} 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
