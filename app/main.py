@@ -11,13 +11,11 @@ from flask import render_template
 from flask import abort
 from flask import flash
 from flask import redirect
-from flask import make_response
 from flask import jsonify
 from flask import url_for
 
 from flask_login import login_required
 from flask_login import current_user
-from sqlalchemy import desc
 # from werkzeug.utils import secure_filename
 
 from PIL import Image, ImageDraw

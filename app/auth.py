@@ -101,7 +101,3 @@ def logout():
     logout_user()
     return redirect(url_for('main.index'))
 
-
-@auth.route('/404')
-def l():
-    return render_template('errors/404.html')
