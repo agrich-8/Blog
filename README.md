@@ -269,7 +269,8 @@
 
 <p>Определение модели:</p>
 
-<pre class="language-python"><code>class Role(db.Model):
+```python
+class Role(db.Model):
 
     
 
@@ -331,7 +332,9 @@
 
     def __repr__(self):
 
-        return '&lt;Role %r&gt;' % self.login</code></pre>
+        return '&lt;Role %r&gt;' % self.login
+  
+```
 
 <p>Модель имеет атрибуты:</p>
 
