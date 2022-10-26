@@ -255,7 +255,8 @@
 
 <p>Роли пользователей строятся на основе привилегий. Привилегии задаются классом Premission</p>
 
-<pre class="language-python"><code>class Permission:
+```python
+class Permission:
 
     COMMENT = 0x02
 
@@ -263,7 +264,8 @@
 
     MODERATE_COMMENTS = 0x08
 
-    ADMINISTER = 0x08</code></pre>
+    ADMINISTER = 0x08
+```
 
 <p>На каждую привелегию отводится 8 битов, из них задействовано только 4</p>
 
@@ -358,7 +360,8 @@ class Role(db.Model):
 
 <h3>Пользователи</h3>
 
-<pre class="language-python"><code>class User(UserMixin, db.Model):
+```python
+class User(UserMixin, db.Model):
 
 
 
@@ -402,7 +405,9 @@ class Role(db.Model):
 
     articles = db.relationship('Article', backref='user', lazy='dynamic')
 
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')</code></pre>
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+
+```
 
 <p>Модель хранит данные о пользователе и имеет связи с таблицей 'articles':</p>
 
@@ -420,7 +425,8 @@ class Role(db.Model):
 
 <h3>Статьи</h3>
 
-<pre class="language-python"><code>class Article(db.Model):
+```python
+class Article(db.Model):
 
 
 
@@ -456,7 +462,9 @@ class Role(db.Model):
 
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
 
-    user_att = db.relationship('User', backref='art_attitude', lazy='dynamic')</code></pre>
+    user_att = db.relationship('User', backref='art_attitude', lazy='dynamic')
+
+```
 
 <p>Модель хранит данные о пользователе и имеет связи с таблицами 'comments' и 'users':</p>
 
@@ -472,7 +480,8 @@ class Role(db.Model):
 
 <h3>Комментарии</h3>
 
-<pre class="language-python"><code>class Comment(db.Model):
+```python
+class Comment(db.Model):
 
 
 
@@ -492,7 +501,8 @@ class Role(db.Model):
 
     users_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
 
-    articles_id = db.Column(db.Integer, db.ForeignKey('articles.id'))</code></pre>
+    articles_id = db.Column(db.Integer, db.ForeignKey('articles.id'))
+```
 
 <p>Модель хранит данные о пользователе и имеет связи с таблицами 'articles' и 'users':</p>
 
