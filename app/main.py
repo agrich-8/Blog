@@ -247,8 +247,8 @@ def article(article_name):
             return redirect(url_for('main.article', article_name=article_name))
         
         elif moder_form.confirm.data:            
-
             if moder_form.position.data != article.article_position and moder_form.position.data != 888:
+                article.confirmed = True
                 position_arts = Article.query.filter_by(confirmed=True).order_by(Article.article_position.desc())
                 for a in position_arts:
                     if a.article_position >= moder_form.position.data:
