@@ -4,7 +4,7 @@
 
 <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=37&duration=4000&pause=1000&color=F7F7F7&width=600&height=55&lines=Flask+Blog" alt="Typing SVG" /></a>
 
-<h2>Блог на Flask</h2>
+<div><hr>
 
 <div>Данный проект является учебным, некоторые технологии могут быть неоправдано использованными. Целью проекта является мзучение фреймворка Flask, его встроенных технологий, таких как:</div>
 
