@@ -515,3 +515,99 @@ class Comment(db.Model):
 </ul>
 
 <p>&nbsp;</p>
+
+    
+<h2>auth.py</h2>
+
+<p>В макете auth.py появляются первые функции представления. При регистрации пользователя происходит создание экземпляра класса модели.</p>
+    
+    ![image](https://user-images.githubusercontent.com/83089491/198161030-79f04a20-3796-4dbc-9d2c-a688be93786c.png)
+
+    
+<p>На указанную почту отправляется письмо для подтверждения пользователя.</p>
+
+![image](https://user-images.githubusercontent.com/83089491/198160986-f9da519b-6686-4afc-9962-af8b032695b3.png)
+
+    
+<p>В ссылку вставлен jwt токен из flask_jwt_extended, что позволяет отслеживать срок годности ссылки, а так же ее безопасность и возможность генерирования в любой момент</p>
+
+<p>Для хеширования и проверки паролей используется werkzeug.security</p>
+
+<p>При реализации этих возможностей модель User пополнилась следующими методами:</p>
+
+```python
+@property
+
+    def password(self):
+
+        raise AttributeError('password is not a readable attribute') 
+
+
+
+    @password.setter
+
+    def password(self, password):
+
+        self.hash = generate_password_hash(
+
+                        password,
+
+                        method='pbkdf2:sha256',
+
+                        salt_length=8
+
+                    ) 
+
+
+
+    def verify_password(self, password):
+
+        return check_password_hash(self.hash, password)
+
+
+
+    @property
+
+    def set_token(self):
+
+        return(self.token)
+
+
+
+    @set_token.setter
+
+    def set_token(self, email):
+
+        self.token = create_access_token(identity=email)
+
+
+
+    def generate_conﬁrmation_token(self):
+
+        token = create_access_token(identity=self.email)
+
+        self.token = token
+
+        db.session.add(self)
+
+        return token
+
+
+
+    def confirm(self, token):
+
+        print('\033[32m token', token)
+
+        print('\033[32m decode', decode_token(token))
+
+        if decode_token(token)['sub'] == self.email:
+
+            self.is_confirmed = True
+
+            db.session.add(self)
+
+            return True
+
+```
+
+<p>&nbsp;</p>
