@@ -72,8 +72,6 @@ class User(UserMixin, db.Model):
                         salt_length=8
                     ) 
 
-    # def art_like(self, arlt)
-
     def verify_password(self, password):
         return check_password_hash(self.hash, password)
 
@@ -136,6 +134,12 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.login
 
+class Permission:
+    COMMENT = 0x02
+    WRITE_ARTICLES = 0x04
+    MODERATE_COMMENTS = 0x08
+    ADMINISTER = 0x08
+
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
@@ -146,11 +150,6 @@ class AnonymousUser(AnonymousUserMixin):
       
 
 login_manager.anonymous_user = AnonymousUser
-class Permission:
-    COMMENT = 0x02
-    WRITE_ARTICLES = 0x04
-    MODERATE_COMMENTS = 0x08
-    ADMINISTER = 0x08
 
 
 class Article(db.Model):
