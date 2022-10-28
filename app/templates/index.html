@@ -32,9 +32,7 @@
                   <img src="{{ url_for('static', filename=arts[0].cover_path) }}" width="427" height="240" style="border-radius: 5px;" />
                 </div>
               </div>
-              
             </div>
-          
             <div class="row mb-2">
               {% for art in arts[1:] %}
               <div class="col-md-6">
@@ -57,7 +55,4 @@
             </div>
           {% endif %}
           <p><a name="top"></a></p> 
-
-          
-        
 {% endblock %}

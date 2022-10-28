@@ -100,9 +100,7 @@ def inject_permissions():
 def index():
     if Article.query.order_by(Article.article_position):
         arts = Article.query.filter_by(confirmed=True).order_by(Article.article_position)
-        print('rrrrrrrrrr')
-        print(arts)
-        print(arts[0:])
+
     return render_template('index.html', arts=arts)
 
 
@@ -251,7 +249,7 @@ def article(article_name):
                 article.confirmed = True
                 position_arts = Article.query.filter_by(confirmed=True).order_by(Article.article_position.desc())
                 for a in position_arts:
-                    if a.article_position >= moder_form.position.data:
+                    if a.article_position and a.article_position >= moder_form.position.data:
                         a.article_position += 1
                         db.session.commit()
 
