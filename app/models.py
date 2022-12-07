@@ -13,13 +13,11 @@ from . import db
 from . import login_manager
 
 
-
-
 class User(UserMixin, db.Model):
 
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True) 
+    id = db.Column(db.Integer, primary_key=True)
     login = db.Column(db.String(44), unique=True)
     email = db.Column(db.String(44), unique=True)
     is_confirmed = db.Column(db.Boolean, default=False)
@@ -34,35 +32,35 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.Text())
     passlen = db.Column(db.Integer)
     thumb_path = db.Column(db.String(255))
-    
+
     art_attitude = db.relationship('UserArtAttitude', backref='user_att', lazy='dynamic')
     articles = db.relationship('Article', backref='user', lazy='dynamic')
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
- 
+
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
-            if self.email == current_app.conﬁg['FLASKY_ADMIN']: 
-                self.role = Role.query.ﬁlter_by(permissions=0xff).ﬁrst() 
+            if self.email == current_app.conﬁg['FLASKY_ADMIN']:
+                self.role = Role.query.ﬁlter_by(permissions=0xff).ﬁrst()
             if self.role is None:
                 print('wwwwwwwwwwwwwwwww')
                 self.role = Role.query.ﬁlter_by(default=True).ﬁrst()
                 print(self.role)
-    
+
     def can(self, permissions):
         return self.role is not None and \
-         (self.role.permissions & permissions) == permissions 
-
+         (self.role.permissions & permissions) == permissions
+=
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
 
     def ping(self):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
-    
+
     @property
     def password(self):
-        raise AttributeError('password is not a readable attribute') 
+        raise AttributeError('password is not a readable attribute')
 
     @password.setter
     def password(self, password):
@@ -70,7 +68,7 @@ class User(UserMixin, db.Model):
                         password,
                         method='pbkdf2:sha256',
                         salt_length=8
-                    ) 
+                    )
 
     def verify_password(self, password):
         return check_password_hash(self.hash, password)
@@ -102,33 +100,33 @@ class User(UserMixin, db.Model):
 
 
 class Role(db.Model):
-    
+
     __tablename__ = 'roles'
-    id = db.Column(db.Integer, primary_key=True) 
+    id = db.Column(db.Integer, primary_key=True)
     login = db.Column(db.String(64), unique=True)
-    default = db.Column(db.Boolean, default=False, index=True) 
+    default = db.Column(db.Boolean, default=False, index=True)
     permissions = db.Column(db.Integer)
 
     users = db.relationship('User', backref='role', lazy='dynamic')
 
     @staticmethod
-    def insert_roles(): 
+    def insert_roles():
         roles = {
             'LowUser': (Permission.WRITE_ARTICLES, False),
             'User': (Permission.COMMENT |
-                     Permission.WRITE_ARTICLES, True), 
+                     Permission.WRITE_ARTICLES, True),
             'Moderator': (Permission.COMMENT |
                         Permission.WRITE_ARTICLES |
-                        Permission.MODERATE_COMMENTS, False), 
+                        Permission.MODERATE_COMMENTS, False),
             'Administrator': (0xff, False)
         }
         for r in roles:
-            role = Role.query.ﬁlter_by(login=r).ﬁrst() 
+            role = Role.query.ﬁlter_by(login=r).ﬁrst()
             if role is None:
                 role = Role(login=r)
             role.permissions = roles[r][0]
-            role.default = roles[r][1] 
-            db.session.add(role) 
+            role.default = roles[r][1]
+            db.session.add(role)
         db.session.commit()
 
     def __repr__(self):
@@ -145,9 +143,9 @@ class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
         return False
 
-    def is_administrator(self): 
+    def is_administrator(self):
       return False
-      
+
 
 login_manager.anonymous_user = AnonymousUser
 
@@ -170,7 +168,6 @@ class Article(db.Model):
     tags = db.Column(db.String(255))
 
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
-    # user_attitude = db.relationship('UserArtAttitude', backref='art_att', lazy='dynamic')
 
 
 class UserArtAttitude(UserMixin, db.Model): # модель ассоциации user и article
@@ -180,7 +177,6 @@ class UserArtAttitude(UserMixin, db.Model): # модель ассоциации 
     users_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     attitude = db.Column(db.Boolean)
     art_att = db.relationship('Article', backref='user_attitude')
-    # user_att = db.relationship('User', backref='art_attitude', lazy='dynamic')
 
 
 
@@ -191,13 +187,13 @@ def load_user(id):
 class Comment(db.Model):
 
     __tablename__ = 'comments'
-    id = db.Column(db.Integer, primary_key=True) 
+    id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow) 
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     disabled = db.Column(db.Boolean)
     path = db.Column(db.String(255))
 
-    users_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
+    users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     articles_id = db.Column(db.Integer, db.ForeignKey('articles.id'))
-    
+
 # db.event.listen(Comment.body, 'set', Comment.on_changed_body)
