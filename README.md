@@ -271,72 +271,7 @@ class Permission:
 
 <p>Определение модели:</p>
 
-```python
-class Role(db.Model):
 
-    
-
-    __tablename__ = 'roles'
-
-    id = db.Column(db.Integer, primary_key=True) 
-
-    login = db.Column(db.String(64), unique=True)
-
-    default = db.Column(db.Boolean, default=False, index=True) 
-
-    permissions = db.Column(db.Integer)
-
-
-
-    users = db.relationship('User', backref='role', lazy='dynamic')
-
-
-
-    @staticmethod
-
-    def insert_roles(): 
-
-        roles = {
-
-            'LowUser': (Permission.WRITE_ARTICLES, False),
-
-            'User': (Permission.COMMENT |
-
-                     Permission.WRITE_ARTICLES, True), 
-
-            'Moderator': (Permission.COMMENT |
-
-                        Permission.WRITE_ARTICLES |
-
-                        Permission.MODERATE_COMMENTS, False), 
-
-            'Administrator': (0xff, False)
-
-        }
-
-        for r in roles:
-
-            role = Role.query.ﬁlter_by(login=r).ﬁrst() 
-
-            if role is None:
-
-                role = Role(login=r)
-
-            role.permissions = roles[r][0]
-
-            role.default = roles[r][1] 
-
-            db.session.add(role) 
-
-        db.session.commit()
-
-
-
-    def __repr__(self):
-
-        return '&lt;Role %r&gt;' % self.login
-  
-```
 
 <p>Модель имеет атрибуты:</p>
 
@@ -360,54 +295,6 @@ class Role(db.Model):
 
 <h3>Пользователи</h3>
 
-```python
-class User(UserMixin, db.Model):
-
-
-
-    __tablename__ = 'users'
-
-
-
-    id = db.Column(db.Integer, primary_key=True) 
-
-    login = db.Column(db.String(44), unique=True)
-
-    email = db.Column(db.String(44), unique=True)
-
-    is_confirmed = db.Column(db.Boolean, default=False)
-
-    hash = db.Column(db.String(44))
-
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-
-    token = db.Column(db.String(1000), unique=True, nullable=True)
-
-    online = db.Column(db.DateTime, default=datetime.utcnow)
-
-    created = db.Column(db.DateTime, default=datetime.utcnow)
-
-    path = db.Column(db.String(254), nullable=True)
-
-    name = db.Column(db.String(64))
-
-    location = db.Column(db.String(255))
-
-    about_me = db.Column(db.Text())
-
-    passlen = db.Column(db.Integer)
-
-    thumb_path = db.Column(db.String(255))
-
-    
-
-    art_attitude = db.relationship('UserArtAttitude', backref='user_att', lazy='dynamic')
-
-    articles = db.relationship('Article', backref='user', lazy='dynamic')
-
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')
-
-```
 
 <p>Модель хранит данные о пользователе и имеет связи с таблицей 'articles':</p>
 
@@ -425,46 +312,6 @@ class User(UserMixin, db.Model):
 
 <h3>Статьи</h3>
 
-```python
-class Article(db.Model):
-
-
-
-    __tablename__ = 'articles'
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
-    text = db.Column(db.Text)
-
-    path = db.Column(db.String(255))
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    description = db.Column(db.Text)
-
-    article_name = db.Column(db.String(255))
-
-    heading = db.Column(db.String(255))
-
-    cover_path = db.Column(db.String(255))
-
-    attitude = db.Column(db.Integer, default=0)
-
-    article_position = db.Column(db.Integer)
-
-    confirmed = db.Column(db.Boolean, default=False)
-
-    tags = db.Column(db.String(255))
-
-
-
-    comments = db.relationship('Comment', backref='post', lazy='dynamic')
-
-    user_att = db.relationship('User', backref='art_attitude', lazy='dynamic')
-
-```
 
 <p>Модель хранит данные о пользователе и имеет связи с таблицами 'comments' и 'users':</p>
 
@@ -480,29 +327,6 @@ class Article(db.Model):
 
 <h3>Комментарии</h3>
 
-```python
-class Comment(db.Model):
-
-
-
-    __tablename__ = 'comments'
-
-    id = db.Column(db.Integer, primary_key=True) 
-
-    text = db.Column(db.Text)
-
-    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow) 
-
-    disabled = db.Column(db.Boolean)
-
-    path = db.Column(db.String(255))
-
-
-
-    users_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
-
-    articles_id = db.Column(db.Integer, db.ForeignKey('articles.id'))
-```
 
 <p>Модель хранит данные о пользователе и имеет связи с таблицами 'articles' и 'users':</p>
 
@@ -532,82 +356,8 @@ class Comment(db.Model):
 
 <p>Для хеширования и проверки паролей используется werkzeug.security.</p>
 
-<p>При реализации этих возможностей модель User пополнилась следующими методами:</p>
+<p>Эти возможности реализованы в методах модели User</p>
 
-```python
-@property
-
-    def password(self):
-
-        raise AttributeError('password is not a readable attribute') 
-
-
-
-    @password.setter
-
-    def password(self, password):
-
-        self.hash = generate_password_hash(
-
-                        password,
-
-                        method='pbkdf2:sha256',
-
-                        salt_length=8
-
-                    ) 
-
-
-
-    def verify_password(self, password):
-
-        return check_password_hash(self.hash, password)
-
-
-
-    @property
-
-    def set_token(self):
-
-        return(self.token)
-
-
-
-    @set_token.setter
-
-    def set_token(self, email):
-
-        self.token = create_access_token(identity=email)
-
-
-
-    def generate_conﬁrmation_token(self):
-
-        token = create_access_token(identity=self.email)
-
-        self.token = token
-
-        db.session.add(self)
-
-        return token
-
-
-
-    def confirm(self, token):
-
-        print('\033[32m token', token)
-
-        print('\033[32m decode', decode_token(token))
-
-        if decode_token(token)['sub'] == self.email:
-
-            self.is_confirmed = True
-
-            db.session.add(self)
-
-            return True
-
-```
 
 <p>&nbsp;</p>
 
