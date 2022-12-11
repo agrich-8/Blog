@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from colorama import init
-from colorama import Fore
 import uuid
 
 from flask import Blueprint
@@ -38,31 +37,31 @@ from .models import Permission
 from .email import send_email
 from . import db
 from .decorators import admin_required
-from .decorators import permission_required 
+from .decorators import permission_required
 
 ALLOWED_EXTENSIONS  =  set(['txt',  'pdf',  'png',  'jpg',  'jpeg',  'gif'])
 
 init()
 main = Blueprint('main', __name__)
 from . import errors
-  
-def square_thumb(thum_img,width,height):    #   https://www.geeksforgeeks.org/generate-square-or-circular-thumbnail-image-with-python-pillow/
-    
+
+def square_thumb(thum_img,width,height):
+
     if height == width:
         return thum_img
-  
+
     elif height > width:
         square_img = Image.new(thum_img.mode, (height, height))
         square_img.paste(thum_img, ((height - width) // 2,0))
         return square_img
-  
+
     else:
         square_img = Image.new(thum_img.mode, (width, width))
         square_img.paste(thum_img, (0, (width - height) // 2))
-        return square_img 
-  
+        return square_img
 
-def allowed_file(filename): 
+
+def allowed_file(filename):
     return '.' in filename and \
                 filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -71,12 +70,12 @@ def load_img(file, path):
     filename = file.filename
     if file.filename == '':
         raise NameError("''")
-        
+
     if file and allowed_file(filename):
         new_filename = str(uuid.uuid4()) + filename[filename.rfind('.'):]
         img_fullpath = os.path.join(path, new_filename)
         file.save(img_fullpath)
-        return {'filename' : new_filename, 
+        return {'filename' : new_filename,
                 'path' : img_fullpath}
     else:
         raise NameError('TypeError')
@@ -87,11 +86,11 @@ def load_img(file, path):
 def imageuploader():
     file = request.files.get('file')
     print(file.filename)
-    filename = load_img(file, current_app.config['UPLOAD_FOLDER'])['filename'] 
+    filename = load_img(file, current_app.config['UPLOAD_FOLDER'])['filename']
     return jsonify({'location' : filename})
 
 
-@main.app_context_processor 
+@main.app_context_processor
 def inject_permissions():
     return dict(Permission=Permission)
 
@@ -106,19 +105,19 @@ def index():
 
 @main.route('/profile/<login>')
 @login_required
-def profile(login):  
+def profile(login):
     user = User.query.filter_by(login=login).first()
     if user is None:
         abort(404)
-    arts = user.articles.order_by(Article.id.desc()) # в запрос добавляется функция desc из sqlalchemy 
+    arts = user.articles.order_by(Article.id.desc()) # в запрос добавляется функция desc из sqlalchemy
     page = request.args.get('page', 1, type=int)
     pagination = user.articles.order_by(Article.created_at.desc()).paginate(
-        page, per_page=current_app.conﬁg['FLASKY_POSTS_PER_PAGE'], 
+        page, per_page=current_app.conﬁg['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     arts = pagination.items
 
     return render_template('profile.html', user=user, article=Article,
-                            arts=arts, pagination=pagination) 
+                            arts=arts, pagination=pagination)
 
 
 @main.route('/create_article', methods=['GET', 'POST'])
@@ -138,12 +137,12 @@ def create_article():
         draft = form.draft.data
         article_name = '_'.join(heading.split()) + str(uuid.uuid4())
         article_path = f'app/static/articlesText/{article_name}.html'
-        
+
         with open(article_path, 'w+', encoding="utf-8") as file:
             file.write(text)
 
         article_path = f'/articlesText/{article_name}.html'
-        article = Article(author_id=current_user.id, path=article_path, 
+        article = Article(author_id=current_user.id, path=article_path,
                         created_at=str(datetime.now(tz=None))[:19],
                         description=description, article_name=article_name,
                         heading=heading, tags=tags)
@@ -156,7 +155,7 @@ def create_article():
                 article.cover_path = f'/images/{filename}'
             except:
                 flash('Name Error')
-        
+
         return redirect(url_for('main.article', article_name=article_name))
 
     return render_template('create_article.html', form=form)
@@ -182,17 +181,15 @@ def article(article_name):
 
     page = request.args.get('page', 1, type=int)
     pagination = article.comments.order_by('id').paginate(
-        page, per_page=current_app.conﬁg['FLASKY_POSTS_PER_PAGE'], 
+        page, per_page=current_app.conﬁg['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     comments = pagination.items
 
     if request.method == 'POST':
         if comment_form.submit.data:
-            print('rrrrrrrr')
             text = comment_form.text.data
             comment_name = 'comment_' + str(uuid.uuid4())
             comment_path = f'app/static/commentsText/{comment_name}.html'
-
             with open(comment_path, 'w+', encoding="utf-8") as file:
                 file.write(text)
             comment_path = f'/commentsText/{comment_name}.html'
@@ -209,7 +206,7 @@ def article(article_name):
                 db.session.add(att)
                 db.session.commit()
                 article.attitude = int(article.attitude) + 1
-            
+
             elif user_att.attitude == None:
                 user_att.attitude = True
                 article.attitude = int(article.attitude) + 1
@@ -221,10 +218,11 @@ def article(article_name):
             elif user_att.attitude == True:
                 user_att.attitude = None
                 article.attitude = int(article.attitude) - 1
+                
             return redirect(url_for('main.article', article_name=article_name))
 
         elif att_form.dislike.data:
-            
+
             if user_att == None:
                 att = UserArtAttitude(articles_id=article.id, users_id=current_user.id, attitude=False)
                 db.session.add(att)
@@ -238,13 +236,13 @@ def article(article_name):
             elif user_att.attitude == True:
                 user_att.attitude = False
                 article.attitude = article.attitude - 2
-            
+
             elif user_att.attitude == False:
                 user_att.attitude = None
                 article.attitude = int(article.attitude) + 1
             return redirect(url_for('main.article', article_name=article_name))
-        
-        elif moder_form.confirm.data:            
+
+        elif moder_form.confirm.data:
             if moder_form.position.data != article.article_position and moder_form.position.data != 888:
                 article.confirmed = True
                 position_arts = Article.query.filter_by(confirmed=True).order_by(Article.article_position.desc())
@@ -267,10 +265,10 @@ def article(article_name):
             elif moder_form.position.data == 666:   #   remove position
                 article.article_position = None
                 article.confirmed = None
-                db.session.commit() 
-                
+                db.session.commit()
+
                 return redirect(url_for('main.article', article_name=article_name))
-            
+
         elif moder_form.delete.data:
 
             if article.path:
@@ -284,7 +282,7 @@ def article(article_name):
 
             db.session.delete(article)
             db.session.commit()
-            
+
             return redirect(url_for('main.index'))
 
 
@@ -297,12 +295,12 @@ def article(article_name):
 def line():
     page = request.args.get('page', 1, type=int)
     pagination = Article.query.order_by(Article.created_at.desc()).paginate(
-        page, per_page=current_app.conﬁg['FLASKY_POSTS_PER_PAGE'], 
+        page, per_page=current_app.conﬁg['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     posts = pagination.items
 
     return render_template('list_of_articles.html', article=Article, User=User,
-                            arts=posts, pagination=pagination) 
+                            arts=posts, pagination=pagination)
 
 
 @main.route('/edit_profile', methods=['GET', 'POST'])
@@ -337,7 +335,7 @@ def edit_user():
                     user.login = login
                 if password:
                     user.password = password
-                if about_me != user.about_me: 
+                if about_me != user.about_me:
                     user.about_me = about_me
                 db.session.add(user)
                 db.session.commit()
@@ -356,12 +354,12 @@ def edit_user():
                 user.path = f'/images/{filename}'
             except:
                 flash('Name Error')
-        
+
         # orig_img=Image.open('sebastian-molina.jpg')
         # w,h = file.size
         # square_img = square_thumb(orig_img, w, h)
         # square_img.save(current_app.config['UPLOAD_FOLDER'])
-        
+
     print(current_user.path)
 
     return render_template('edit_user.html', user=current_user, form=form)

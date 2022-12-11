@@ -2,7 +2,7 @@ import os
 from datetime import timedelta
 
 class Config:
-    
+
     SECRET_KEY = 'ew342f2f23mb4'
 
     SQLALCHEMY_DATABASE_URI ='mysql+pymysql://root:88uUheEWfk3@localhost/db'
@@ -15,8 +15,8 @@ class Config:
     UPLOAD_FOLDER = 'app\static\images'
 
     FLASKY_POSTS_PER_PAGE = 4
-    
-    
+
+
     def init_app(app):
         pass
 
@@ -27,19 +27,19 @@ class DevelopmentConﬁg(Conﬁg):
     MAIL_PORT = 587
     MAIL_DEBUG = True
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')             
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')             
-    MAIL_DEFAULT_SENDER  = os.environ.get('MAIL_USERNAME')      
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER  = os.environ.get('MAIL_USERNAME')
     FLASKY_MAIL_SUBJECT_PREFIX = '[FLASK BLOG]'
     FLASKY_MAIL_SENDER = f"Flasky Admin <{os.environ.get('MAIL_USERNAME')}>"
     FLASKY_ADMIN = os.environ.get('MAIL_USERNAME')
 
-class TestingConﬁg(Conﬁg): 
+class TestingConﬁg(Conﬁg):
 
     TESTING = True
 
 conﬁg = {
-    'development': DevelopmentConﬁg, 
+    'development': DevelopmentConﬁg,
     'testing': TestingConﬁg,
     'default': DevelopmentConﬁg
 }
