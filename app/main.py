@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from colorama import init
-from colorama import Fore
 import uuid
 
 from flask import Blueprint
@@ -46,7 +45,7 @@ init()
 main = Blueprint('main', __name__)
 from . import errors
 
-def square_thumb(thum_img,width,height):    #   https://www.geeksforgeeks.org/generate-square-or-circular-thumbnail-image-with-python-pillow/
+def square_thumb(thum_img,width,height):
 
     if height == width:
         return thum_img

@@ -1,6 +1,4 @@
 from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
 
 from flask import Blueprint
 from flask import render_template
